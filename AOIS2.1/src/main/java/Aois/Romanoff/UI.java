@@ -15,14 +15,14 @@ public class UI {
         truthTable.print();
         NormalFormCreator normalFormCreator = new NormalFormCreator();
         HashMap<String, Object> result ;
-        result = normalFormCreator.SDNF(truthTable.getCombinations(), truthTable.getStatements());
+        result = normalFormCreator.sdnf(truthTable.getCombinations(), truthTable.getStatements());
         System.out.println("СДНФ" + result.get("result"));
         System.out.println("Числовая форма" + result.get("NumericalForm"));
-        result = normalFormCreator.SKNF(truthTable.getCombinations(), truthTable.getStatements());
+        result = normalFormCreator.sknf(truthTable.getCombinations(), truthTable.getStatements());
         System.out.println("СКНФ" + result.get("result"));
         System.out.println("Числовая форма" + result.get("NumericalForm"));
         DecimalConverter decimalConverter = new DecimalConverter();
-        ArrayList<Integer> normalForm = normalFormCreator.IndexForm(truthTable);
+        ArrayList<Integer> normalForm = normalFormCreator.indexForm(truthTable);
         System.out.println("Индексная форма" + normalForm + "-" + decimalConverter.ConvertFrBinToDecimal(normalForm));
     }
 

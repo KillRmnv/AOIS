@@ -24,7 +24,7 @@ public class TruthTable {
         LogicExpressionAnalyser logicExpressionAnalyser = new LogicExpressionAnalyser();
         for (int i = 0; i < combinations.size(); i++) {
             for (int j = 0; j < BasicLogicExpressions.size(); j++) {
-                combinations.get(i).add(logicExpressionAnalyser.Analisis(combinations.get(i), BasicLogicExpressions.get(j), amntOfStatements) ? 1 : 0);
+                combinations.get(i).add(logicExpressionAnalyser.isTrue(combinations.get(i), BasicLogicExpressions.get(j), amntOfStatements) ? 1 : 0);
             }
         }
     }

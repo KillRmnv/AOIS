@@ -26,7 +26,7 @@ class NormalFormCreatorTest {
     @Test
     void testSDNF() {
         ArrayList<ArrayList<Integer>> combinations = truthTable.getCombinations();
-        HashMap<String, Object> sdnfResult = normalFormCreator.SDNF(combinations, statements);
+        HashMap<String, Object> sdnfResult = normalFormCreator.sdnf(combinations, statements);
 
         ArrayList<Integer> numericalForm = (ArrayList<Integer>) sdnfResult.get("NumericalForm");
         assertEquals(5, numericalForm.size(), "Ожидаем 4 строки в числовой форме СДНФ");
@@ -45,7 +45,7 @@ class NormalFormCreatorTest {
     @Test
     void testSKNF() {
         ArrayList<ArrayList<Integer>> combinations = truthTable.getCombinations();
-        HashMap<String, Object> sknfResult = normalFormCreator.SKNF(combinations, statements);
+        HashMap<String, Object> sknfResult = normalFormCreator.sknf(combinations, statements);
 
         ArrayList<Integer> numericalForm = (ArrayList<Integer>) sknfResult.get("NumericalForm");
         assertEquals(3, numericalForm.size(), "Ожидаем 4 строки в числовой форме СКНФ");
@@ -62,7 +62,7 @@ class NormalFormCreatorTest {
 
     @Test
     void testIndexForm() {
-        ArrayList<Integer> indexForm = normalFormCreator.IndexForm(truthTable);
+        ArrayList<Integer> indexForm = normalFormCreator.indexForm(truthTable);
 
         assertEquals(8, indexForm.size(), "Ожидаем 8 значений в индексной форме");
         assertArrayEquals(new Integer[]{1,0,1,0,1,0,1,1}, indexForm.toArray(), "Индексная форма не совпадает с ожидаемой");

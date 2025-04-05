@@ -3,7 +3,7 @@ package Aois.Romanoff;
 import java.util.ArrayList;
 
 public class LogicExpressionAnalyser {
-    public boolean Analisis(ArrayList<Integer> currTruthTableLine, String basicLogicExpression, int amntOfStatements) {
+    public boolean isTrue(ArrayList<Integer> currTruthTableLine, String basicLogicExpression, int amntOfStatements) {
         int i = 0;
         String expression = "";
         char statement = '0';
