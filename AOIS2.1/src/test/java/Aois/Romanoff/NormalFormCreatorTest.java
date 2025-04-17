@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,7 +26,7 @@ class NormalFormCreatorTest {
 
     @Test
     void testSDNF() {
-        ArrayList<ArrayList<Integer>> combinations = truthTable.getCombinations();
+        List<List<Integer>> combinations = truthTable.getCombinations();
         HashMap<String, Object> sdnfResult = normalFormCreator.sdnf(combinations, statements);
 
         ArrayList<Integer> numericalForm = (ArrayList<Integer>) sdnfResult.get("NumericalForm");
@@ -44,7 +45,7 @@ class NormalFormCreatorTest {
 
     @Test
     void testSKNF() {
-        ArrayList<ArrayList<Integer>> combinations = truthTable.getCombinations();
+        List<List<Integer>> combinations = truthTable.getCombinations();
         HashMap<String, Object> sknfResult = normalFormCreator.sknf(combinations, statements);
 
         ArrayList<Integer> numericalForm = (ArrayList<Integer>) sknfResult.get("NumericalForm");

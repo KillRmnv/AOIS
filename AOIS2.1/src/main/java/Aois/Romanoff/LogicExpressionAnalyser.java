@@ -1,9 +1,10 @@
 package Aois.Romanoff;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class LogicExpressionAnalyser {
-    public boolean isTrue(ArrayList<Integer> currTruthTableLine, String basicLogicExpression, int amntOfStatements) {
+    public boolean isTrue(List<Integer> currTruthTableLine, String basicLogicExpression, int amntOfStatements) {
         int i = 0;
         String expression = "";
         char statement = '0';

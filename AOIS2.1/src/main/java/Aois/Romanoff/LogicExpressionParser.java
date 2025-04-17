@@ -1,8 +1,6 @@
 package Aois.Romanoff;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,14 +26,21 @@ public class LogicExpressionParser {
         Pattern lines = Pattern.compile("\\w+");
         String copy = new String(expression);
         expressionMatcher = lines.matcher(expression);
+        Set<String> linesSet = new HashSet<>();
         while (expressionMatcher.find()) {
-            String Line = expressionMatcher.group();
-            if (!Statements.containsKey(Line)) {
-                Statements.put(Line, (char) (Statements.size() + 945));
-                expression = expression.replaceFirst(Line, String.valueOf((char) (Statements.size() + 944)));
-            } else
-                expression = expression.replaceFirst(Line, String.valueOf(Statements.get(Line)));
+            linesSet.add(expressionMatcher.group());
         }
+
+        List<String> linesArray=new ArrayList<>(linesSet);
+        linesArray.sort(String::compareTo);
+
+        int num = 1;
+        for (String line : linesArray) {
+            Statements.put(line, (char) (Statements.size() + 945));
+            expression = expression.replaceAll(line, String.valueOf((char) (num + 944)));
+            num++;
+        }
+
         return expression;
     }
 

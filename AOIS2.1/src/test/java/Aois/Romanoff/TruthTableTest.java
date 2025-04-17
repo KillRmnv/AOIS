@@ -47,7 +47,7 @@ class TruthTableTest {
     @Test
     void testAllPossibleCombinations() {
         truthTable.createTruthTable(expressions);
-        ArrayList<ArrayList<Integer>> combinations = truthTable.getCombinations();
+        List<List<Integer>> combinations = truthTable.getCombinations();
         assertEquals(32, combinations.size(), "Ожидаем 10 комбинаций для 5 переменных");
         assertArrayEquals(new Integer[]{0, 0, 0, 0, 0, 1, 0, 1, 1, 1}, combinations.get(0).subList(0, 10).toArray());
         assertArrayEquals(new Integer[]{0, 0, 0, 0, 1, 1, 0, 1, 1, 1}, combinations.get(1).subList(0, 10).toArray());
@@ -69,7 +69,7 @@ class TruthTableTest {
         statements.put("B", 'B');
         truthTable.setStatements(statements);
 
-        ArrayList<ArrayList<Integer>> combinations = new ArrayList<>();
+        List<List<Integer>> combinations = new ArrayList<>();
         combinations.add(new ArrayList<>(List.of(0, 0, 0, 0)));
         combinations.add(new ArrayList<>(List.of(0, 1, 0, 1)));
         combinations.add(new ArrayList<>(List.of(1, 0, 0, 1)));

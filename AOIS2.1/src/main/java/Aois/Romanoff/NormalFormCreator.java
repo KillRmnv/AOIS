@@ -1,12 +1,9 @@
 package Aois.Romanoff;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 public class NormalFormCreator {
-    public HashMap<String, Object> sdnf(ArrayList<ArrayList<Integer>> truthTable, LinkedHashMap<String, Character> statements) {
+    public HashMap<String, Object> sdnf(List<List<Integer>> truthTable, LinkedHashMap<String, Character> statements) {
         String result = new String();
         ArrayList<Integer> NumericalForm = new ArrayList<>();
         Iterator<String> keyIterator;
@@ -44,7 +41,7 @@ public class NormalFormCreator {
         return resultMap;
     }
 
-    public HashMap<String, Object> sknf(ArrayList<ArrayList<Integer>> truthTable, LinkedHashMap<String, Character> statements) {
+    public HashMap<String, Object> sknf(List<List<Integer>> truthTable, LinkedHashMap<String, Character> statements) {
         String result = new String();
         HashMap<Integer, String> hashTableOfSKNF = new HashMap<>();
         int numberOfStatement = 11;

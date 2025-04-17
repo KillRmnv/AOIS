@@ -15,7 +15,7 @@ public class TruthTable {
     @Getter
     private LinkedHashMap<String, Character> Statements = new LinkedHashMap<>();
     @Getter
-    private ArrayList<ArrayList<Integer>> combinations;
+    private List<List<Integer>> combinations;
 
     public void createTruthTable(HashMap<Integer, String> basicLogicExpressions) {
         BasicLogicExpressions = basicLogicExpressions;
@@ -24,14 +24,14 @@ public class TruthTable {
         LogicExpressionAnalyser logicExpressionAnalyser = new LogicExpressionAnalyser();
         for (int i = 0; i < combinations.size(); i++) {
             for (int j = 0; j < BasicLogicExpressions.size(); j++) {
-                combinations.get(i).add(logicExpressionAnalyser.isTrue(combinations.get(i), BasicLogicExpressions.get(j), amntOfStatements) ? 1 : 0);
+                combinations.get(i).add(logicExpressionAnalyser.isTrue((ArrayList<Integer>) combinations.get(i), BasicLogicExpressions.get(j), amntOfStatements) ? 1 : 0);
             }
         }
     }
 
-    private ArrayList<ArrayList<Integer>> allPossibleCombinations(int amntOfStatements) {
+    private List<List<Integer>> allPossibleCombinations(int amntOfStatements) {
         BinNumber binNumber = new BinNumber();
-        ArrayList<Integer> number = new ArrayList<>();
+        List<Integer> number = new ArrayList<>();
         for (int i = 0; i < amntOfStatements + 1; i++) {
             number.add(0);
         }
@@ -39,7 +39,7 @@ public class TruthTable {
 
         number.removeLast();
         number.add(1);
-        ArrayList<ArrayList<Integer>> possibleCombinations = new ArrayList<>();
+       List<List<Integer>> possibleCombinations = new ArrayList<>();
         for (int i = 0; i < Math.pow(2, amntOfStatements); i++) {
             possibleCombinations.add(new ArrayList<>(binNumber.Getter()));
             possibleCombinations.getLast().removeFirst();
@@ -104,7 +104,9 @@ public class TruthTable {
         }
         System.out.println();
 
-        for (ArrayList<Integer> combination : combinations) {
+
+        // for 3 lab
+        for (var combination : combinations) {
             for (int i = 0; i < Statements.size(); i++) {
                 System.out.print(combination.get(i) + " ");
             }
