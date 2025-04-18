@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String expression = "!((A->B)|(C~D))&E";
+        String expression = "(A~(B->C))|(D&E)";
         LogicExpressionParser parser = new LogicExpressionParser();
         TruthTable truthTable = new TruthTable();
         truthTable.createTruthTable(parser.parseOnBasicExpressions(expression, truthTable.getStatements()));
@@ -57,9 +57,7 @@ public class Main {
                 glued.add(minimizedFormula.toString());
                 minimizedFormula = new StringBuilder();
             } else {
-                // minimizedFormula.append("(");
                 minimizedFormula.append(SDNF.get(keys.get(i)));
-                //  minimizedFormula.append(")");
                 glued.add(minimizedFormula.toString());
                 minimizedFormula = new StringBuilder();
             }

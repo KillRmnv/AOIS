@@ -10,8 +10,60 @@ public class CalculationMethod {
 
     public HashMap<Integer, String> applyMethodSDNF(HashMap<Integer, String> SDNF, int amnt) {
         SDNF = GluerOfLogicExpression.glueLogicExpression(SDNF, SDNF.size(), amnt);
-        // printResult(SDNF,1);
         return erasingImplicants(SDNF, false);
+    }
+    private boolean equalStatements(HashMap<Integer, String> SKNForSDNF,
+                                    HashMap<Integer, String> SKNForSDNFwithoutImplicant, boolean type,
+                                    int numOfAnthrExpressionTraverse){
+        if (type) {
+            int amnt = numOfAnthrExpressionTraverse;
+            for (; SKNForSDNF.containsKey(amnt); amnt++) ;
+            if (amnt % 10 == 1) {
+                SKNForSDNFwithoutImplicant.put(numOfAnthrExpressionTraverse, "0");
+                return false;
+            } else
+                SKNForSDNFwithoutImplicant.remove(numOfAnthrExpressionTraverse);
+
+        } else {
+            int amnt = numOfAnthrExpressionTraverse;
+            for (; SKNForSDNF.containsKey(amnt); amnt++) ;
+            if (amnt % 10 == 1) {
+                SKNForSDNFwithoutImplicant.put(numOfAnthrExpressionTraverse, "1");
+                return false;
+            } else
+                SKNForSDNFwithoutImplicant.remove(numOfAnthrExpressionTraverse);
+        }
+        return true;
+    }
+    private boolean notEqualStatements(HashMap<Integer, String> SKNForSDNF,
+                                       HashMap<Integer, String> SKNForSDNFwithoutImplicant, boolean type,
+                                       int numOfAnthrExpressionTraverse, int numOfExpressionTraverse,
+                                       Set<Integer> anthrExpressionTraverseSet){
+        String Statement = SKNForSDNF.get(numOfAnthrExpressionTraverse);
+        StringBuilder builder = new StringBuilder();
+        if (Statement.charAt(0) == '!') {
+            builder.append(Statement.substring(1));
+        } else {
+            builder.append("!");
+            builder.append(Statement);
+        }
+        if (SKNForSDNF.get(numOfExpressionTraverse).contentEquals(builder)) {
+            if (type) {
+                for (var key : anthrExpressionTraverseSet) {
+                    SKNForSDNFwithoutImplicant.remove(key);
+                }
+                SKNForSDNFwithoutImplicant.put((anthrExpressionTraverseSet.iterator().next() / 10) * 10 + 1, "1");
+                return false;
+            } else {
+
+                for (var key : anthrExpressionTraverseSet) {
+                    SKNForSDNFwithoutImplicant.remove(key);
+                }
+                SKNForSDNFwithoutImplicant.put((anthrExpressionTraverseSet.iterator().next() / 10) * 10 + 1, "0");
+                return false;
+            }
+        }
+        return true;
     }
 
     // метод берет одно утверждение и сравнивает с другим.Если совпадает для СДНФ,просто убирем его.Если совпадает для СКНФ и количество утверждений равно 1, заменяем на 0.
@@ -22,51 +74,10 @@ public class CalculationMethod {
                                                 Set<Integer> anthrExpressionTraverseSet
     ) {
         if (SKNForSDNF.get(numOfAnthrExpressionTraverse).equals(SKNForSDNF.get(numOfExpressionTraverse))) {
-            if (type) {
-                int amnt = numOfAnthrExpressionTraverse;
-                for (; SKNForSDNF.containsKey(amnt); amnt++) ;
-                if (amnt % 10 == 1) {
-                    SKNForSDNFwithoutImplicant.put(numOfAnthrExpressionTraverse, "0");
-                    return false;
-                } else
-                    SKNForSDNFwithoutImplicant.remove(numOfAnthrExpressionTraverse);
-
-            } else {
-                int amnt = numOfAnthrExpressionTraverse;
-                for (; SKNForSDNF.containsKey(amnt); amnt++) ;
-                if (amnt % 10 == 1) {
-                    SKNForSDNFwithoutImplicant.put(numOfAnthrExpressionTraverse, "1");
-                    return false;
-                } else
-                    SKNForSDNFwithoutImplicant.remove(numOfAnthrExpressionTraverse);
-            }
+           return equalStatements(SKNForSDNF,SKNForSDNFwithoutImplicant,type,numOfAnthrExpressionTraverse);
         } else {
-            String Statement = SKNForSDNF.get(numOfAnthrExpressionTraverse);
-            StringBuilder builder = new StringBuilder();
-            if (Statement.charAt(0) == '!') {
-                builder.append(Statement.substring(1));
-            } else {
-                builder.append("!");
-                builder.append(Statement);
-            }
-            if (SKNForSDNF.get(numOfExpressionTraverse).contentEquals(builder)) {
-                if (type) {
-                    for (var key : anthrExpressionTraverseSet) {
-                        SKNForSDNFwithoutImplicant.remove(key);
-                    }
-                    SKNForSDNFwithoutImplicant.put((anthrExpressionTraverseSet.iterator().next() / 10) * 10 + 1, "1");
-                    return false;
-                } else {
-
-                    for (var key : anthrExpressionTraverseSet) {
-                        SKNForSDNFwithoutImplicant.remove(key);
-                    }
-                    SKNForSDNFwithoutImplicant.put((anthrExpressionTraverseSet.iterator().next() / 10) * 10 + 1, "0");
-                    return false;
-                }
-            }
+           return notEqualStatements(SKNForSDNF,SKNForSDNFwithoutImplicant,type,numOfAnthrExpressionTraverse,numOfExpressionTraverse,anthrExpressionTraverseSet);
         }
-        return true;
     }
 
     // Метод удаляет конституэнту numOfExpressionTraverse в конституэнте numOfAnthrExpressionTraverse. Если досрочно уничтожены все утверждения
@@ -128,15 +139,8 @@ public class CalculationMethod {
         }
         return false;
     }
+    private void formKeys(Set<Integer> keysSet,List<HashMap<Integer, String>> keys,HashMap<Integer, String> SKNForSDNF,boolean type) {
 
-    // удаляет конституэнту в других конституэнтах(в цикле перебирает все)
-    private HashMap<Integer, String> erasingImplicants(HashMap<Integer, String> SKNForSDNF, boolean type) {
-        Set<Integer> keysSet = new HashSet<>();
-        for (var k : SKNForSDNF.keySet()) {
-            int newKey = k / 10;
-            keysSet.add(newKey);
-        }
-        List<HashMap<Integer, String>> keys = new ArrayList<>();
         for (int numOfexpression = 11; keysSet.contains(numOfexpression / 10); numOfexpression += 10) {
             HashMap<Integer, String> SKNForSDNFwithoutImplicant = new HashMap<>(SKNForSDNF);
             for (int numOfAnthrExpression = 11; keysSet.contains(numOfAnthrExpression / 10); numOfAnthrExpression += 10) {
@@ -168,6 +172,18 @@ public class CalculationMethod {
                 keys.add(SKNForSDNFwithoutImplicant);
             }
         }
+    }
+
+    // удаляет конституэнту в других конституэнтах(в цикле перебирает все)
+    private HashMap<Integer, String> erasingImplicants(HashMap<Integer, String> SKNForSDNF, boolean type) {
+        Set<Integer> keysSet = new HashSet<>();
+        for (var k : SKNForSDNF.keySet()) {
+            int newKey = k / 10;
+            keysSet.add(newKey);
+        }
+        List<HashMap<Integer, String>> keys = new ArrayList<>();
+
+        formKeys(keysSet,keys,SKNForSDNF,type);
 
         if (keys.size() == 1) {
             return keys.getFirst();

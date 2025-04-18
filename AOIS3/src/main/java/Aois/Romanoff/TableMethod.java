@@ -93,20 +93,13 @@ public class TableMethod {
             }
         }
     }
-
-    private void createTable(List<String> constituents, HashMap<Integer, String> gluedExpression, int type) {
-        table = new ArrayList<>();
-        Set<Integer> validImplicants = new HashSet<>(Set.of());
-        Set<Integer> questionableImplicants = new HashSet<>();
-        Boolean[] coveredConstituens = new Boolean[constituents.size()];
-        for (int i = 0; i < constituents.size(); i++) {
-            coveredConstituens[i] = false;
-        }
+    private void formGluedExpression(HashMap<Integer, String> gluedExpression){
         List<Integer> keySet = new ArrayList<>(gluedExpression.keySet());
         keySet.sort(Integer::compareTo);
         int indexOfExpression = 11, indexTraverse = indexOfExpression;
-        // form gluedExpession
+
         for (int i = 0; i < keySet.size() - 1; i++) {
+
             var line = gluedExpression.get(keySet.get(i));
             gluedExpression.remove(keySet.get(i));
             gluedExpression.put(indexTraverse, line);
@@ -120,8 +113,8 @@ public class TableMethod {
         var line = gluedExpression.get(keySet.getLast());
         gluedExpression.remove(keySet.getLast());
         gluedExpression.put(indexTraverse, line);
-        // form gluedExpession
-        //form Table
+    }
+    private void formTable(HashMap<Integer, String> gluedExpression,List<String> constituents){
         for (int begNum = 11; gluedExpression.containsKey(begNum); begNum = begNum + 10) {
             table.add(new ArrayList<>());
             for (int indexOfConstituent = 0; indexOfConstituent < constituents.size(); indexOfConstituent++) {
@@ -153,8 +146,17 @@ public class TableMethod {
                 }
             }
         }
-        //form Table
-
+    }
+    private void createTable(List<String> constituents, HashMap<Integer, String> gluedExpression, int type) {
+        table = new ArrayList<>();
+        Set<Integer> validImplicants = new HashSet<>(Set.of());
+        Set<Integer> questionableImplicants = new HashSet<>();
+        Boolean[] coveredConstituens = new Boolean[constituents.size()];
+        for (int i = 0; i < constituents.size(); i++) {
+            coveredConstituens[i] = false;
+        }
+        formGluedExpression(gluedExpression);
+        formTable(gluedExpression,constituents);
         printTable(constituents, gluedExpression);
         int columns = table.getFirst().size();
         for (int i = 0; i < columns; i++) {
@@ -196,7 +198,6 @@ public class TableMethod {
                     validImplicants.add(coveredConstituent);
             }
         }
-        //printResult(gluedExpression,1);
         if (!validImplicants.isEmpty())
             questionableImplicants = identifyRedundantImplicants(questionableImplicants, validImplicants, type);
 
@@ -218,48 +219,7 @@ public class TableMethod {
 
     private void printTable(List<String> constituents, HashMap<Integer, String> gluedExpression) {
 
-        List<String> glued = new ArrayList<>();
-        List<Integer> keys = new ArrayList<>(gluedExpression.keySet());
-        keys.sort(Integer::compareTo);
-        StringBuilder minimizedFormula = new StringBuilder();
-        minimizedFormula.append("(");
-        minimizedFormula.append(gluedExpression.get(keys.get(0)));
-        if (keys.getFirst() / 10 != keys.get(1) / 10) {
-            minimizedFormula.append(")");
-            glued.add(minimizedFormula.toString());
-            minimizedFormula = new StringBuilder();
-        } else {
-            minimizedFormula.append("&");
-        }
-        for (int i = 1; i < keys.size() - 1; i++) {
-            if (keys.get(i + 1) / 10 == keys.get(i) / 10 && !(keys.get(i - 1) / 10 == keys.get(i) / 10)) {
-                minimizedFormula.append("(");
-                minimizedFormula.append(gluedExpression.get(keys.get(i)));
-                minimizedFormula.append("&");
-            } else if (keys.get(i + 1) / 10 == keys.get(i) / 10 && keys.get(i - 1) / 10 == keys.get(i) / 10) {
-                minimizedFormula.append(gluedExpression.get(keys.get(i)));
-                minimizedFormula.append("&");
-            } else if (keys.get(i + 1) / 10 != keys.get(i) / 10 && keys.get(i - 1) / 10 == keys.get(i) / 10) {
-                minimizedFormula.append(gluedExpression.get(keys.get(i)));
-                minimizedFormula.append(")");
-                glued.add(minimizedFormula.toString());
-                minimizedFormula = new StringBuilder();
-            } else {
-                minimizedFormula.append("(");
-                minimizedFormula.append(gluedExpression.get(keys.get(i)));
-                minimizedFormula.append(")");
-                glued.add(minimizedFormula.toString());
-                minimizedFormula = new StringBuilder();
-            }
-        }
-        if (keys.getLast() / 10 != keys.get(keys.size() - 2) / 10) {
-            minimizedFormula.append("(");
-        }
-        minimizedFormula.append(gluedExpression.get(keys.getLast()));
-
-        minimizedFormula.append(")");
-        glued.add(minimizedFormula.toString());
-
+        List<String> glued = new ArrayList<>(Main.constituentsList(gluedExpression));
 
         int columnCount = constituents.size();
         int[] columnWidths = new int[columnCount + 1];

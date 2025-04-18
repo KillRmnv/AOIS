@@ -44,7 +44,7 @@ public class Graph {
             }
         }
     }
-    List<String> codesRectangle(Set<Integer> rectangle){
+    public List<String> codesRectangle(Set<Integer> rectangle){
         List<String> code=new ArrayList<>();
         for(var node:nodes.values()){
             if(rectangle.contains(node.getData())){
@@ -57,13 +57,6 @@ public class Graph {
         nodes = new HashMap<>();
         neightbors = new ArrayList<>();
         covered=new HashMap<>();
-    }
-
-    public Graph(HashMap<Integer, Node> nodes) {
-        this.nodes = nodes;
-        neightbors = new ArrayList<>();
-        covered=new HashMap<>();
-
     }
 
     public void adjastNodes(Set<String> validNodes) {
@@ -100,7 +93,7 @@ public class Graph {
             this.covered = new HashMap<>();
     }
 
-    Set<String> greyCodes() {
+    public Set<String> greyCodes() {
         Set<String> result = new HashSet<>();
         for (var node : nodes.values()) {
             result.add(node.getGreyCode());
