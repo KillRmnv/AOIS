@@ -157,7 +157,7 @@ public class TableMethod {
         }
         formGluedExpression(gluedExpression);
         formTable(gluedExpression,constituents);
-        printTable(constituents, gluedExpression);
+        printTable(constituents, gluedExpression,type);
         int columns = table.getFirst().size();
         for (int i = 0; i < columns; i++) {
             List<Integer> nums = new ArrayList<>();
@@ -202,7 +202,7 @@ public class TableMethod {
             questionableImplicants = identifyRedundantImplicants(questionableImplicants, validImplicants, type);
 
         delRedundantImplicants(questionableImplicants, gluedExpression);
-        printTable(constituents, gluedExpression);
+        printTable(constituents, gluedExpression,type);
     }
 
     private List<String> getKonstituents(HashMap<Integer, String> SKNForSDNF) {
@@ -217,9 +217,9 @@ public class TableMethod {
         return result;
     }
 
-    private void printTable(List<String> constituents, HashMap<Integer, String> gluedExpression) {
+    private void printTable(List<String> constituents, HashMap<Integer, String> gluedExpression,int type) {
 
-        List<String> glued = new ArrayList<>(Main.constituentsList(gluedExpression));
+        List<String> glued = new ArrayList<>(Main.constituentsList(gluedExpression,type));
 
         int columnCount = constituents.size();
         int[] columnWidths = new int[columnCount + 1];

@@ -12,6 +12,7 @@ public class CalculationMethod {
         SDNF = GluerOfLogicExpression.glueLogicExpression(SDNF, SDNF.size(), amnt);
         return erasingImplicants(SDNF, false);
     }
+
     private boolean equalStatements(HashMap<Integer, String> SKNForSDNF,
                                     HashMap<Integer, String> SKNForSDNFwithoutImplicant, boolean type,
                                     int numOfAnthrExpressionTraverse){
@@ -35,6 +36,7 @@ public class CalculationMethod {
         }
         return true;
     }
+
     private boolean notEqualStatements(HashMap<Integer, String> SKNForSDNF,
                                        HashMap<Integer, String> SKNForSDNFwithoutImplicant, boolean type,
                                        int numOfAnthrExpressionTraverse, int numOfExpressionTraverse,
@@ -116,7 +118,10 @@ public class CalculationMethod {
             if(SKNForSDNF.size()<2){
                 return false;
             }
-            List<String> constituentsList = Main.constituentsList(SKNForSDNF);
+            int Type=1;
+            if(type)
+                Type=0;
+            List<String> constituentsList = Main.constituentsList(SKNForSDNF,Type);
             constituentsList.removeAll(uniqueStatements);
             if(constituentsList.isEmpty()) {
                 return false;
@@ -139,6 +144,7 @@ public class CalculationMethod {
         }
         return false;
     }
+
     private void formKeys(Set<Integer> keysSet,List<HashMap<Integer, String>> keys,HashMap<Integer, String> SKNForSDNF,boolean type) {
 
         for (int numOfexpression = 11; keysSet.contains(numOfexpression / 10); numOfexpression += 10) {

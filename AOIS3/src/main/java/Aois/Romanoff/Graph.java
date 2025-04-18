@@ -44,6 +44,16 @@ public class Graph {
             }
         }
     }
+    public void setCoveredStringsIfEmpty(Set<String> covered){
+        if(covered.isEmpty()){
+            return;
+        }
+        for(var node:nodes.values()){
+            if(covered.contains(node.getGreyCode())){
+                this.covered.put(node.getGreyCode(),node.getData());
+            }
+        }
+    }
     public List<String> codesRectangle(Set<Integer> rectangle){
         List<String> code=new ArrayList<>();
         for(var node:nodes.values()){

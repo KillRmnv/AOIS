@@ -8,12 +8,13 @@ public class KarnosMapMethod {
     private List<List<Integer>> map;
     private List<Graph> graphs;
 
-    KarnosMapMethod() {
+    public KarnosMapMethod() {
         map = new ArrayList<>();
         graphs = new ArrayList<>();
     }
 
-    private void fillMap(List<List<Integer>> combinations, List<String> rowsGreysCode, List<String> columnsGreysCode, int type) {
+    private void fillMap(List<List<Integer>> combinations, List<String> rowsGreysCode,
+                         List<String> columnsGreysCode, int type) {
         HashMap<String, List<Integer>> combinationGreyCode = new HashMap<>();
         for (int row = 0; row < rowsGreysCode.size(); row++) {
             this.map.add(new ArrayList<>());
@@ -29,6 +30,11 @@ public class KarnosMapMethod {
         int numRows = 0;
         HashMap<String, Integer> graphsRelativeToTheirCode = new HashMap<>();
         boolean difficultCase = false;
+        int plus=0;
+        if((rowsGreysCode.getFirst().length() + columnsGreysCode.getFirst().length())==3){
+            plus++;
+            difficultCase = true;
+        }
         for (int i = 0; i < Math.floor(Math.pow(2, rowsGreysCode.getFirst().length() + columnsGreysCode.getFirst().length() - 4)); i++) {
             graphs.add(new Graph());
             difficultCase = true;
@@ -47,22 +53,27 @@ public class KarnosMapMethod {
         }
 
         // из таблички формирует строку, которая будет использована для поиска инднксов соответствующего кода грея
+
+
         for (int row = 0; row < combinations.size(); row++) {
             StringBuilder table = new StringBuilder();
             for (int j = 0; j < rowsGreysCode.getFirst().length() + columnsGreysCode.getFirst().length(); j++)
                 table.append(String.valueOf(combinations.get(row).get(j)));
             List<Integer> indexes = combinationGreyCode.get(table.toString());
-            table.delete(0, rowsGreysCode.getFirst().length() - 2);
-            table.delete(2, 2 + columnsGreysCode.getFirst().length() - 2);
-            Node newNode = new Node((indexes.getFirst() % 4) * 10 + indexes.getLast() % 4, table.toString());
-            //  int index = (indexes.getFirst() / 4) * (indexes.getLast()/4+1) + indexes.getLast() / 4;
-            int index = (indexes.getFirst() / 4) * (columnsGreysCode.size() / 4) + indexes.getLast() / 4;
-            if (combinations.get(row).getLast() == type)
-                graphs.get(index).getNodes().put(newNode.getData(), newNode);
-
+            if (difficultCase) {
+                if(plus==0) {
+                    table.delete(0, rowsGreysCode.getFirst().length() - 2);
+                    table.delete(2, 2 + columnsGreysCode.getFirst().length() - 2);
+                }
+                Node newNode = new Node((indexes.getFirst() % 4) * 10 + indexes.getLast() % 4, table.toString());
+                //  int index = (indexes.getFirst() / 4) * (indexes.getLast()/4+1) + indexes.getLast() / 4;
+                int index = (indexes.getFirst() / 4) * (columnsGreysCode.size() / 4) + indexes.getLast() / 4;
+                if (combinations.get(row).getLast() == type)
+                    graphs.get(index).getNodes().put(newNode.getData(), newNode);
+            }
             this.map.get(indexes.getFirst()).set(indexes.getLast(), combinations.get(row).getLast());
         }
-        if (difficultCase) {
+        if (difficultCase&& plus==0) {
             for (int graph = 0; graph < graphs.size(); graph++) {
                 graphs.get(graph).createGraph(4, 4);
                 List<Integer> neightbors = new ArrayList<>();
@@ -80,6 +91,8 @@ public class KarnosMapMethod {
                 }
                 graphs.get(graph).setNeightbors(neightbors);
             }
+        }else if(plus==1){
+            graphs.getFirst().createGraph(4, 2);
         }
     }
 
@@ -107,69 +120,121 @@ public class KarnosMapMethod {
         return greysCode;
     }
 
-    private boolean checkForFull() {
+    private boolean checkForFull(int type) {
+        int notType = -1;
+        if (type == 1) {
+            notType = 0;
+        } else {
+            notType = 1;
+        }
         for (var raw : map) {
             for (var cell : raw) {
-                if (cell == 0)
+                if (cell == notType)
                     return false;
             }
         }
         return true;
     }
 
-    private List<int[]> checkFor4() {
+    private List<int[]> checkFor2(List<List<Integer>> covered, int type) {
         List<int[]> result = new ArrayList<>();
-        for (int j = 0; j < map.getFirst().size() - 1; j++) {
-            if (map.getFirst().get(j) == 1 && map.getFirst().get(j + 1) == 1
-                    && map.getLast().get(j) == 1 && map.getLast().get(j + 1) == 1) {
-                result.add(new int[]{j, j + 11});
-                j++;
-            }
-        }
-        return result;
-    }
-
-    private List<int[]> checkFor2(List<List<Integer>> covered) {
-        List<int[]> result = new ArrayList<>();
-        for (int j = 0; j < map.getFirst().size() - 1; j++) {
-            if ((map.getFirst().get(j) == 1 && map.getFirst().get(j + 1) == 1) &&
-                    (covered.getFirst().get(j) == 0 || covered.getFirst().get(j + 1) == 0)) {
-                result.add(new int[]{j, j + 1});
-            } else if ((map.getFirst().get(j) == 1 && map.getLast().get(j) == 1) &&
-                    (covered.getFirst().get(j) == 0 || covered.getLast().get(j) == 0)) {
-                result.add(new int[]{j, j + 10});
-            } else if ((covered.getLast().get(j) == 1 && covered.getLast().get(j + 1) == 1) &&
-                    (covered.getLast().get(j) == 1 || covered.getLast().get(j + 1) == 1)) {
-                result.add(new int[]{j + 10, j + 11});
-            }
-        }
-        if ((map.getFirst().getLast() == 1 && map.getLast().getLast() == 1) &&
-                (covered.getFirst().getLast() == 0 || covered.getLast().getLast() == 0)) {
+        int notType = -1;
+        if (type == 1)
+            notType = 0;
+        else
+            notType = 1;
+        if ((map.getFirst().getLast() == type && map.getLast().getLast() == type) &&
+                (covered.getFirst().getLast() == notType || covered.getLast().getLast() == notType)) {
             result.add(new int[]{map.getFirst().size() - 1, map.getFirst().size() + 9});
+            covered.getFirst().set(map.getFirst().size() - 1, type);
+            covered.getLast().set(map.getLast().size() - 1, type);
+        }
+        for (int j = 0; j < map.getFirst().size() - 1; j++) {
+            if ((map.getFirst().get(j) == type && map.getFirst().get(j + 1) == type) &&
+                    (covered.getFirst().get(j) == notType || covered.getFirst().get(j + 1) == notType)) {
+
+                result.add(new int[]{j, j + 1});
+                covered.getFirst().set(j, type);
+                covered.getFirst().set(j + 1, type);
+            }
+            if ((map.getLast().get(j) == type && map.getLast().get(j + 1) == type) &&
+                    (covered.getLast().get(j) == notType || covered.getLast().get(j + 1) == notType)) {
+                result.add(new int[]{j + 10, j + 11});
+                covered.getLast().set(j, type);
+                covered.getLast().set(j + 1, type);
+            }
+            if ((map.getFirst().get(j) == type && map.getLast().get(j) == type) &&
+                    (covered.getFirst().get(j) == notType || covered.getLast().get(j) == notType)) {
+                result.add(new int[]{j, j + 10});
+                covered.getFirst().set(j, type);
+                covered.getLast().set(j, type);
+            }
+        }
+
+        return result;
+    }
+
+    private List<int[]> checkFor1(int type) {
+        List<int[]> result = new ArrayList<>();
+        if (map.getFirst().getFirst() == type && map.getFirst().get(1) != type
+                && map.getLast().getFirst() != type) {
+            result.add(new int[]{0});
+        }
+        if (map.getLast().getFirst() == type && map.getLast().get(1) != type
+                && map.getFirst().getFirst() != type) {
+            result.add(new int[]{10});
+        }
+        for (int cell = 1; cell < map.getFirst().size() - 1; cell++) {
+            if (map.getFirst().get(cell) == type && map.getFirst().get(cell + 1) != type
+                    && map.getLast().get(cell) != type && map.getFirst().get(cell - 1) != type) {
+                result.add(new int[]{cell});
+            }
+            if (map.getLast().get(cell) == type && map.getLast().get(cell + 1) != type
+                    && map.getLast().get(cell - 1) != type && map.getFirst().get(cell) != type) {
+                result.add(new int[]{10 + cell});
+            }
+        }
+        if (map.getFirst().getLast() == type && map.getFirst().get(map.getFirst().size() - 2) != type
+                && map.getLast().getLast() != type) {
+            result.add(new int[]{map.getFirst().size() - 1});
+        }
+        if (map.getLast().getLast() == type && map.getLast().get(map.getLast().size() - 2) != type
+                && map.getFirst().getLast() != type) {
+            result.add(new int[]{10 + (map.getFirst().size() - 1)});
         }
         return result;
     }
 
-    private List<int[]> rectanglesInSimpleCase() {
+    private List<int[]> rectanglesInSimpleCase(int type) {
+        int notType = -1;
+        if (type == 1)
+            notType = 0;
+        else
+            notType = 1;
         List<int[]> rectangles = new ArrayList<>();
-        if (checkForFull()) {
+        if (checkForFull(type)) {
             rectangles.add(new int[]{0, map.size() * 10 + map.getFirst().size()});
             return rectangles;
         }
-        rectangles.addAll(checkFor4());
-        List<List<Integer>> covered = new ArrayList<>(map);
+        List<List<Integer>> covered = new ArrayList<>();
+        for (var row : map) {
+            covered.add(new ArrayList<>());
+            for (var cell : row) {
+                covered.getLast().add(cell);
+            }
+        }
         for (var raw : covered) {
-            for (var cell : raw)
-                raw.set(cell, 0);
+            for (int cell = 0; cell < raw.size(); cell++)
+                raw.set(cell, notType);
         }
         for (var rectangle : rectangles) {
-            covered.getFirst().set(rectangle[0], 1);
-            covered.getFirst().set(rectangle[0] + 1, 1);
-            covered.getLast().set(rectangle[0], 1);
-            covered.getLast().set(rectangle[0] + 1, 1);
+            covered.getFirst().set(rectangle[0], type);
+            covered.getFirst().set(rectangle[0] + 1, type);
+            covered.getLast().set(rectangle[0], type);
+            covered.getLast().set(rectangle[0] + 1, type);
         }
-        rectangles.addAll(checkFor2(covered));
-
+        rectangles.addAll(checkFor2(covered, type));
+        rectangles.addAll(checkFor1(type));
         return rectangles;
     }
 
@@ -265,9 +330,11 @@ public class KarnosMapMethod {
         return rectangles;
     }
 
-    private boolean delRectangles(Set<Set<Integer>> squares, Set<Set<Integer>> rectangles, Node traverse, Set<Integer> covered) {
+    private boolean delRectangles(Set<Set<Integer>> squares, Set<Set<Integer>> rectangles, Node traverse,
+                                  Set<Integer> covered) {
         for (var square : squares) {
-            if (square.contains(traverse.getUp())) {
+            if (square.contains(traverse.getUp())||square.contains(traverse.getLeft())
+                    ||square.contains(traverse.getRight())||square.contains(traverse.getDown())) {
                 Set<Set<Integer>> Squares = new HashSet<>(squares);
                 Squares.remove(square);
                 if (checkCovered(Squares, rectangles, covered.size())) {
@@ -281,7 +348,8 @@ public class KarnosMapMethod {
         return false;
     }
 
-    private void checkForSmallRectangles(Node node, Set<Integer> covered, Set<Set<Integer>> squares, Set<Set<Integer>> rectangles) {
+    private void checkForSmallRectangles(Node node, Set<Integer> covered, Set<Set<Integer>> squares,
+                                         Set<Set<Integer>> rectangles) {
         Node traverse = node;
         Set<Integer> rectangle = new HashSet<>();
         if (traverse.getUp() != -10) {
@@ -416,7 +484,7 @@ public class KarnosMapMethod {
             return true;
         return false;
     }
-    //TODO: minimize
+
     private Set<Set<Integer>> rectanglesIn4VariablesCase(int num) {
         Set<Integer> covered = new HashSet<>();
         for (var node : graphs.get(num).getCovered().keySet()) {
@@ -432,9 +500,9 @@ public class KarnosMapMethod {
         }
 
         Set<Set<Integer>> squares = new HashSet<>();
-        if(rect8.size()==3){
+        if (rect8.size() == 3) {
             Set<Integer> bigSquare = new HashSet<>();
-            for(var rect: rect8){
+            for (var rect : rect8) {
                 bigSquare.addAll(rect);
             }
             squares.add(bigSquare);
@@ -486,8 +554,8 @@ public class KarnosMapMethod {
         }
         if (squares.size() != newSquares.size())
             squares = newSquares;
-        else if(!rect8.isEmpty()){
-            squares=rect8;
+        else if (!rect8.isEmpty()) {
+            squares = rect8;
         }
         for (var node : graphs.get(num).getNodes().values()) {
             if (!covered.contains(node.getData()) && node.getData() != -10) {
@@ -499,7 +567,7 @@ public class KarnosMapMethod {
         squares.addAll(rectangles);
         return squares;
     }
-    //TODO: minimize
+
     private Set<Set<Integer>> findrect8(Node node, int num) {
         if ((node.getRight() == -10 && node.getLeft() == -10) || (node.getUp() == -10 && node.getDown() == -10)) {
             return null;
@@ -566,7 +634,7 @@ public class KarnosMapMethod {
     }
 
     private List<String> collectGreysCode(List<String> rowsGreysCode, List<String> columnsGreysCode, Set<Integer> rectangle,
-                                          LinkedHashMap<String, Character> statements) {
+                                          LinkedHashMap<String, Character> statements, int type) {
         int[] previouseDigitsRow = null;
         int[] previouseDigitsColumn = null;
         Pair<int[], int[]> grysCode = new Pair<>(previouseDigitsRow, previouseDigitsColumn);
@@ -574,13 +642,13 @@ public class KarnosMapMethod {
             grysCode = collectGreysCodeNode(grysCode.getKey(), grysCode.getValue(), node, rowsGreysCode, columnsGreysCode);
         }
 
-        return unchangeableCode(grysCode.getValue(), grysCode.getKey(), statements);
+        return unchangeableCode(grysCode.getKey(), grysCode.getValue(), statements, type);
     }
 
-    private Pair<int[], int[]> collectGreysCodeNode(int[] previouseDigitsRow1,
-                                                    int[] previouseDigitsColumn1, int node, List<String> rowsGreysCode1, List<String> columnsGreysCode1) {
-        int row = node % 10;
-        int column = node / 10;
+    private Pair<int[], int[]> collectGreysCodeNode(int[] previouseDigitsRow1, int[] previouseDigitsColumn1, int node,
+                                                    List<String> rowsGreysCode1, List<String> columnsGreysCode1) {
+        int row = node / 10;
+        int column = node % 10;
         String rowLine = rowsGreysCode1.get(row);
         String columnLine = columnsGreysCode1.get(column);
         int[] digitsRow = new int[rowLine.length()];
@@ -596,14 +664,14 @@ public class KarnosMapMethod {
     }
 
     private List<String> unchangeableCode(int[] previouseDigitsRow, int[] previouseDigitsColumn,
-                                          LinkedHashMap<String, Character> statements) {
+                                          LinkedHashMap<String, Character> statements, int type) {
         List<String> result = new ArrayList<>();
         List<String> keys = new ArrayList<>(statements.keySet());
 
         for (int i = 0; i < previouseDigitsRow.length; i++) {
             if (previouseDigitsRow[i] != -1) {
                 StringBuilder builder = new StringBuilder();
-                if (previouseDigitsRow[i] == 0) {
+                if (previouseDigitsRow[i] != type) {
                     builder.append('!');
                 }
                 builder.append(keys.get(i));
@@ -613,7 +681,7 @@ public class KarnosMapMethod {
         for (int i = 0; i < previouseDigitsColumn.length; i++) {
             if (previouseDigitsColumn[i] != -1) {
                 StringBuilder builder = new StringBuilder();
-                if (previouseDigitsColumn[i] == 0) {
+                if (previouseDigitsColumn[i] != type) {
                     builder.append('!');
                 }
                 builder.append(keys.get(i + previouseDigitsRow.length));
@@ -623,38 +691,54 @@ public class KarnosMapMethod {
         return result;
     }
 
-    private List<String> collectGreysCode(List<String> rowsGreysCode, List<String> columnsGreysCode, int[] rectangle, LinkedHashMap<String, Character> statements) {
+    private List<String> collectGreysCode(List<String> rowsGreysCode, List<String> columnsGreysCode, int[] rectangle,
+                                          LinkedHashMap<String, Character> statements, int type) {
         int[] previouseDigitsRow = null;
         int[] previouseDigitsColumn = null;
-        for (int i = rectangle[0]; i <= rectangle[1] % 10; i++) {
+        if (rectangle.length == 1) {
             int[] digits = new int[rowsGreysCode.getFirst().length()];
-            for (int j = 0; j < rowsGreysCode.get(i).length(); j++)
-                digits[j] = Character.getNumericValue(rowsGreysCode.get(i).charAt(j));
-            previouseDigitsRow = differenceGreyCode(previouseDigitsRow, digits);
+            for (int j = 0; j < rowsGreysCode.get(rectangle[0] / 10).length(); j++)
+                digits[j] = Character.getNumericValue(rowsGreysCode.get(rectangle[0] / 10).charAt(j));
+            previouseDigitsRow = digits;
+            int[] digits1 = new int[columnsGreysCode.getFirst().length()];
+            for (int j = 0; j < columnsGreysCode.get(rectangle[0] % 10).length(); j++)
+                digits1[j] = Character.getNumericValue(columnsGreysCode.get(rectangle[0] % 10).charAt(j));
+            previouseDigitsColumn = digits1;
+        } else {
+            for (int i = rectangle[0] / 10; i <= rectangle[1] / 10; i++) {
+                int[] digits = new int[rowsGreysCode.getFirst().length()];
+                for (int j = 0; j < rowsGreysCode.get(i).length(); j++)
+                    digits[j] = Character.getNumericValue(rowsGreysCode.get(i).charAt(j));
+                previouseDigitsRow = differenceGreyCode(previouseDigitsRow, digits);
+            }
+            for (int i = rectangle[0] % 10; i <= rectangle[1] % 10; i++) {
+                int[] digits = new int[columnsGreysCode.getFirst().length()];
+                for (int j = 0; j < columnsGreysCode.get(i).length(); j++)
+                    digits[j] = Character.getNumericValue(columnsGreysCode.get(i).charAt(j));
+                previouseDigitsColumn = differenceGreyCode(previouseDigitsColumn, digits);
+            }
         }
-        for (int i = rectangle[0]; i <= rectangle[1] / 10; i++) {
-            int[] digits = new int[columnsGreysCode.getFirst().length()];
-            for (int j = 0; j < columnsGreysCode.get(i).length(); j++)
-                digits[j] = Character.getNumericValue(columnsGreysCode.get(i).charAt(j));
-            previouseDigitsColumn = differenceGreyCode(previouseDigitsColumn, digits);
-        }
-        return unchangeableCode(previouseDigitsRow, previouseDigitsColumn, statements);
+        return unchangeableCode(previouseDigitsRow, previouseDigitsColumn, statements, type);
     }
-
-    private void print(List<List<String>> minimized, int type) {
+    String term(int type,List<String> row){
+        StringBuilder result = new StringBuilder();
+        result.append("(");
+        for (int i = 0; i < row.size() - 1; i++) {
+            result.append(row.get(i));
+            if (type == 1) {
+                result.append("&");
+            } else {
+                result.append("|");
+            }
+        }
+        result.append(row.getLast());
+        result.append(")");
+        return result.toString();
+    }
+    public void print(List<List<String>> minimized, int type) {
         StringBuilder result = new StringBuilder();
         for (List<String> row : minimized) {
-            result.append("(");
-            for (int i = 0; i < row.size() - 1; i++) {
-                result.append(row.get(i));
-                if (type == 1) {
-                    result.append("&");
-                } else {
-                    result.append("|");
-                }
-            }
-            result.append(row.getLast());
-            result.append(")");
+            result.append(term(type, row));
             if (type == 1) {
                 result.append("|");
             } else {
@@ -716,7 +800,7 @@ public class KarnosMapMethod {
         return result;
     }
 
-    private void adjastGraph(List<Integer> cycle, Set<String> nodes){
+    private void adjastGraph(List<Integer> cycle, Set<String> nodes) {
         Graph graph = new Graph(graphs.get(cycle.getFirst()));
         Set<String> commonNodes = new HashSet<>();
         Set<String> previouseNodes = new HashSet<>(graphs.get(cycle.getFirst()).getCovered().keySet());
@@ -743,7 +827,8 @@ public class KarnosMapMethod {
 
     }
 
-    private void findSquare1(HashMap<String, Integer> covered,List<Set<Set<Integer>>> commonRectangles,List<Integer> cycle,List<List<String>> graphCodes){
+    private void findSquare1(HashMap<String, Integer> covered, List<Set<Set<Integer>>> commonRectangles,
+                             List<Integer> cycle, List<List<String>> graphCodes) {
         List<String> graphsGreyCodes = new ArrayList<>();
         HashMap<String, Integer> covered1 = new HashMap<>();
         var coveredLastGraph = graphs.getLast().getCovered();
@@ -799,7 +884,7 @@ public class KarnosMapMethod {
         }
         graphs.getLast().setCovered(covered);
 
-        findSquare1(covered,commonRectangles,cycle,graphCodes);
+        findSquare1(covered, commonRectangles, cycle, graphCodes);
         graphs.removeLast();
 
         result.put(1, commonRectangles);
@@ -808,7 +893,8 @@ public class KarnosMapMethod {
         return result;
     }
 
-    private List<String> getTerm(int[] graphsBits, List<String> graphsGreyCodes, TruthTable truthTable, List<String> rowsGreysCode, List<String> columnsGreysCode) {
+    private List<String> getTerm(int[] graphsBits, List<String> graphsGreyCodes, TruthTable truthTable, List<String> rowsGreysCode,
+                                 List<String> columnsGreysCode, int type) {
         int rowLength = rowsGreysCode.getFirst().length() - 2;
         int columnsLength = columnsGreysCode.getFirst().length() - 2;
 
@@ -827,11 +913,57 @@ public class KarnosMapMethod {
         for (int i = 0; i < 2; i++) {
             unchangeableCodeColumns[i + columnsLength] = graphBits[i + 2];
         }
-        return unchangeableCode(unchangeableCodeRows, unchangeableCodeColumns, truthTable.getStatements());
+        return unchangeableCode(unchangeableCodeRows, unchangeableCodeColumns, truthTable.getStatements(), type);
     }
-    //TODO: minimize
-    private List<Integer> identifyMax(List<Set<Set<Integer>>> graphRectangles, List<Set<Set<Integer>>> graphsRectangles, List<List<Set<Set<Integer>>>> rectInCycles,
-                              List<List<Integer>> cycles) {
+
+    private void findCommonRectanglesInCycles(List<List<Integer>> cycles, List<HashMap<Integer, Object>> resultCycles,
+                                              List<List<Set<Set<Integer>>>> rectInCycles) {
+        for (var cycle = 0; cycle < cycles.size(); cycle++) {
+            var res = findRectangles(cycles.get(cycle));
+            resultCycles.add(res);
+            List<Set<Set<Integer>>> commonRectangles = (List<Set<Set<Integer>>>) res.get(1);
+            rectInCycles.add(commonRectangles);
+            res.put(4, cycles.get(cycle));
+        }
+    }
+
+    private void findCommonRectanglesInNeightborsMaps(List<HashMap<Integer, Object>> result) {
+        Set<Integer> usedGraphs = new HashSet<>();
+        for (var graph = 0; graph < graphs.size(); ++graph) {
+            List<Integer> neightbors = graphs.get(graph).getNeightbors();
+            for (var neightbor : neightbors) {
+                if (!usedGraphs.contains(neightbor)) {
+                    List<List<Integer>> pair = new ArrayList<>();
+                    pair.add(new ArrayList<>());
+                    pair.getFirst().add(neightbor);
+                    pair.getFirst().add(graph);
+                    result.add(findRectangles(pair.getFirst()));
+                    result.getLast().put(4, new ArrayList<>(Arrays.asList(graph, neightbor)));
+                } else
+                    result.add(null);
+            }
+            usedGraphs.add(graph);
+        }
+    }
+
+    private void findRectanglesInSigleMap(List<Set<Set<Integer>>> graphRectangles, List<List<String>> rowGreyCode,
+                                          List<List<String>> columnGreyCode, List<String> rowsGreysCode, List<String> colomnsGreysCode) {
+        int prevNum = -1;
+        int numCol = 0;
+        for (var graph = 0; graph < graphs.size(); ++graph) {
+            graphRectangles.add(rectanglesIn4VariablesCase(graph));
+            int numRow = graph % (rowsGreysCode.size() / 4);
+            if (numRow != prevNum + 1) {
+                numCol++;
+            }
+            prevNum = numRow;
+            rowGreyCode.add(rowsGreysCode.subList(numRow * 4, numRow * 4 + 4));
+            columnGreyCode.add(colomnsGreysCode.subList(numCol * 4, numCol * 4 + 4));
+        }
+    }
+
+    private List<Integer> identifyMax(List<Set<Set<Integer>>> graphRectangles, List<Set<Set<Integer>>> graphsRectangles,
+                                      List<List<Set<Set<Integer>>>> rectInCycles, List<List<Integer>> cycles) {
 
         int maxSize1 = 0;
         int max1 = 0;
@@ -874,7 +1006,7 @@ public class KarnosMapMethod {
             for (int rectangle = 0; rectangle < rectInCycles.get(rectangles).size(); rectangle++) {
                 if (rectInCycles.get(rectangles).get(rectangle) != null)
                     for (var rect : rectInCycles.get(rectangles).get(rectangle)) {
-                        max3 += rect.size()*cycles.get(rectangles).size();
+                        max3 += rect.size() * cycles.get(rectangles).size();
                     }
                 if (max3 > maxSize3) {
                     index3.clear();
@@ -888,12 +1020,12 @@ public class KarnosMapMethod {
             index3.add(-1);
         }
         List<Integer> result = new ArrayList<>();
-        if (maxSize3 >= maxSize1&&maxSize1!=0&&maxSize3!=0) {
+        if (maxSize3 >= maxSize1 && maxSize1 != 0 && maxSize3 != 0) {
             result.add(1);
             result.addAll(index3);
             return result;
         }
-        if (maxSize1 >= maxSize2&&maxSize1!=0&&maxSize2!=0) {
+        if (maxSize1 >= maxSize2 && maxSize1 != 0 && maxSize2 != 0) {
             result.add(2);
             result.addAll(index1);
             return result;
@@ -906,8 +1038,103 @@ public class KarnosMapMethod {
 
         return null;
     }
-    //TODO: minimize
-    public void createKarnos(String expression, int type) {
+    public static boolean isPowerOfTwo(int n) {
+        return n > 0 && (n & (n - 1)) == 0;
+    }
+    private void handleMoreThen4VariablesCase(TruthTable truthTable, List<String> rowsGreysCode,
+                                              List<String> colomnsGreysCode, List<List<String>> minimizedFormulas, int type) {
+        while (true) {
+            List<Graph> graphCopy = new ArrayList<>();
+            for (Graph graph : graphs) {
+                graphCopy.add(new Graph(graph)); // Используем конструктор копирования
+            }
+            List<List<Integer>> cycles = new ArrayList<>(Graph.findAllCycles(graphs));
+            cycles.sort((a, b) -> b.size() - a.size());
+            List<HashMap<Integer, Object>> resultCycles = new ArrayList<>();
+            List<List<Set<Set<Integer>>>> rectInCycles = new ArrayList<>(cycles.size());
+            findCommonRectanglesInCycles(cycles, resultCycles, rectInCycles);
+
+            List<HashMap<Integer, Object>> result = new ArrayList<>();
+            findCommonRectanglesInNeightborsMaps(result);
+
+            graphs = new ArrayList<>();
+            for (Graph graph : graphCopy) {
+                graphs.add(new Graph(graph)); // Используем конструктор копирования
+            }
+            List<Set<Set<Integer>>> graphsRectangles = new ArrayList<>();
+            for (var res = 0; res < result.size(); res++) {
+                if (result.get(res) != null)
+                    graphsRectangles.addAll((List<Set<Set<Integer>>>) result.get(res).get(1));
+                else {
+                    graphsRectangles.add(null);
+                }
+            }
+            List<Set<Set<Integer>>> graphRectangles = new ArrayList<>();
+            List<List<String>> rowGreyCode = new ArrayList<>();
+            List<List<String>> columnGreyCode = new ArrayList<>();
+            findRectanglesInSigleMap(graphRectangles, rowGreyCode, columnGreyCode, rowsGreysCode, colomnsGreysCode);
+
+            graphs = new ArrayList<>();
+            for (Graph graph : graphCopy) {
+                graphs.add(new Graph(graph));
+            }
+
+            var max = identifyMax(graphRectangles, graphsRectangles, rectInCycles, cycles);
+            if (max == null)
+                break;
+            switch (max.getFirst()) {
+                case 1:
+                    int cycleNum = 0;
+                    for (int i = 1; i < max.size(); i++) {
+                        if (max.get(i) == -1) {
+                            cycleNum++;
+                            continue;
+                        }
+                        int index=0;
+                        for (var rect : rectInCycles.get(max.get(i)).getFirst()) {
+                            List<Integer> indexes = (ArrayList<Integer>) resultCycles.get(max.get(i)).get(4);
+                            //List<String> code = graphs.get(indexes.getLast()).codesRectangle(rect);
+                            List<List<String>> code =(List<List<String>>) resultCycles.get(max.get(i)).get(3);
+                            minimizedFormulas.add(getTerm((int[]) resultCycles.get(max.get(i)).get(2),
+                                    code.get(index), truthTable, rowsGreysCode, colomnsGreysCode, type));
+                            for (int j = 0; j < indexes.size(); j++)
+                                graphs.get(indexes.get(j)).setCoveredStringsIfEmpty(new HashSet<>(code.get(index)));
+                            index++;
+                        }
+                    }
+                    break;
+                case 2:
+                    graphRectangles.clear();
+                    for (int i = 1; i < max.size(); i++) {
+                        if (graphsRectangles.get(max.get(i)) != null) {
+                            int index=0;
+                            for (var rect : graphsRectangles.get(max.get(i))) {
+                                List<Integer> indexes = (ArrayList<Integer>) result.get(max.get(i)).get(4);
+                                List<List<String>> code = (List<List<String>>) result.get(max.get(i)).get(3);
+                                minimizedFormulas.add(getTerm((int[]) result.get(max.get(i)).get(2),
+                                        code.get(index), truthTable, rowsGreysCode, colomnsGreysCode, type));
+                                var prevCovered = graphs.get(indexes.getLast()).setGetCovered(rect);
+                                graphs.get(indexes.getFirst()).setCovered(prevCovered);
+                                //neightbor
+                                index++;
+                            }
+                        }
+                    }
+                    break;
+                case 3:
+                    for (int i = 1; i < max.size(); i++) {
+                        if (graphRectangles.get(max.get(i)) != null)
+                            for (var rect : graphRectangles.get(max.get(i))) {
+                                minimizedFormulas.add(collectGreysCode( rowGreyCode.get(max.get(i)),columnGreyCode.get(max.get(i)),
+                                        rect, truthTable.getStatements(), type));
+                                graphs.get(max.get(i)).setCovered(rect);
+                            }
+                    }
+            }
+        }
+    }
+
+    public List<List<String>> createKarnos(String expression, int type) {
         LogicExpressionParser parser = new LogicExpressionParser();
         TruthTable truthTable = new TruthTable();
         truthTable.createTruthTable(parser.parseOnBasicExpressions(expression, truthTable.getStatements()));
@@ -917,135 +1144,20 @@ public class KarnosMapMethod {
         fillMap(truthTable.getCombinations(), rowsGreysCode, colomnsGreysCode, type);
         List<List<String>> minimizedFormulas = new ArrayList<>();
         printTable(rowsGreysCode, colomnsGreysCode);
-        if (truthTable.getStatements().size() < 4) {
-            List<int[]> rectangles = rectanglesInSimpleCase();
+        if (truthTable.getStatements().size() < 3) {
+            List<int[]> rectangles = rectanglesInSimpleCase(type);
             for (var rectangle : rectangles) {
-                minimizedFormulas.add(collectGreysCode(rowsGreysCode, colomnsGreysCode, rectangle, truthTable.getStatements()));
+                minimizedFormulas.add(collectGreysCode(rowsGreysCode, colomnsGreysCode, rectangle, truthTable.getStatements(), type));
             }
-        } else if (truthTable.getStatements().size() == 4) {
+        } else if (truthTable.getStatements().size() == 4||truthTable.getStatements().size() == 3) {
             Set<Set<Integer>> rectangles = rectanglesIn4VariablesCase(0);
             for (var rectangle : rectangles) {
-                minimizedFormulas.add(collectGreysCode(rowsGreysCode, colomnsGreysCode, rectangle, truthTable.getStatements()));
+                minimizedFormulas.add(collectGreysCode(rowsGreysCode, colomnsGreysCode, rectangle, truthTable.getStatements(), type));
             }
         } else {
-            while (true) {
-                List<Graph> graphCopy = new ArrayList<>();
-                for (Graph graph : graphs) {
-                    graphCopy.add(new Graph(graph)); // Используем конструктор копирования
-                }
-                List<List<Integer>> cycles = new ArrayList<>(Graph.findAllCycles(graphs));
-                cycles.sort((a, b) -> b.size() - a.size());
-                List<HashMap<Integer, Object>> resultCycles = new ArrayList<>();
-                List<List<Set<Set<Integer>>>> rectInCycles = new ArrayList<>(cycles.size());
-                for (var cycle = 0; cycle < cycles.size(); cycle++) {
-                    var res = findRectangles(cycles.get(cycle));
-                    resultCycles.add(res);
-                    List<Set<Set<Integer>>> commonRectangles = (List<Set<Set<Integer>>>) res.get(1);
-                    rectInCycles.add(commonRectangles);
-                    res.put(4,cycles.get(cycle));
-                }
-
-                Set<Integer> usedGraphs = new HashSet<>();
-
-                List<HashMap<Integer, Object>> result = new ArrayList<>();
-                for (var graph = 0; graph < graphs.size(); ++graph) {
-                    List<Integer> neightbors = graphs.get(graph).getNeightbors();
-                    for (var neightbor : neightbors) {
-                        if (!usedGraphs.contains(neightbor)) {
-                            List<List<Integer>> pair = new ArrayList<>();
-                            pair.add(new ArrayList<>());
-                            pair.getFirst().add(neightbor);
-                            pair.getFirst().add(graph);
-                            result.add(findRectangles(pair.getFirst()));
-                            result.getLast().put(4, new ArrayList<>(Arrays.asList(graph, neightbor)));
-                        } else
-                            result.add(null);
-                    }
-                    usedGraphs.add(graph);
-                }
-                graphs = new ArrayList<>();
-                for (Graph graph : graphCopy) {
-                    graphs.add(new Graph(graph)); // Используем конструктор копирования
-                }
-                List<Set<Set<Integer>>> graphsRectangles = new ArrayList<>();
-                for (var res = 0; res < result.size(); res++) {
-                    if (result.get(res) != null)
-                        graphsRectangles.addAll((List<Set<Set<Integer>>>) result.get(res).get(1));
-                    else {
-                        graphsRectangles.add(null);
-                    }
-                }
-                List<Set<Set<Integer>>> graphRectangles = new ArrayList<>();
-                List<List<String>> rowGreyCode = new ArrayList<>();
-                List<List<String>> columnGreyCode = new ArrayList<>();
-                int prevNum = -1;
-                int numCol = 0;
-                for (var graph = 0; graph < graphs.size(); ++graph) {
-                    graphRectangles.add(rectanglesIn4VariablesCase(graph));
-                    int numRow = graph % (rowsGreysCode.size() / 4);
-                    if (numRow != prevNum + 1) {
-                        numCol++;
-                    }
-                    prevNum = numRow;
-                    rowGreyCode.add(rowsGreysCode.subList(numRow * 4, numRow * 4 + 4));
-                    columnGreyCode.add(colomnsGreysCode.subList(numCol * 4, numCol * 4 + 4));
-                }
-                graphs = new ArrayList<>();
-                for (Graph graph : graphCopy) {
-                    graphs.add(new Graph(graph)); // Используем конструктор копирования
-                }
-
-                var max = identifyMax(graphRectangles, graphsRectangles, rectInCycles,cycles);
-                if (max == null)
-                    break;
-                switch (max.getFirst()) {
-                    case 1:
-                        int cycleNum = 0;
-                        for (int i = 1; i < max.size(); i++) {
-                            if (max.get(i) == -1) {
-                                cycleNum++;
-                                continue;
-                            }
-                            for (var rect : rectInCycles.get(max.get(i)).getFirst()) {
-                                //chsnge result
-                                List<Integer> indexes = (ArrayList<Integer>) resultCycles.get(max.get(i)).get(4);
-                                List<String> code = graphs.get(indexes.getLast()).codesRectangle(rect);
-                                minimizedFormulas.add(getTerm((int[]) resultCycles.get(max.get(i)).get(2), code, truthTable, rowsGreysCode, colomnsGreysCode));
-                                var prevCovered = graphs.get(indexes.getLast()).setGetCovered(rect);
-                                for(int j=0;j<indexes.size()-1;j++)
-                                graphs.get(indexes.get(j)).setCovered(prevCovered);
-                                //neightbor
-                            }
-                        }
-                        break;
-                    case 2:
-                        graphRectangles.clear();
-                        for (int i = 1; i < max.size(); i++) {
-                            if (graphsRectangles.get(max.get(i)) != null)
-                                for (var rect : graphsRectangles.get(max.get(i))) {
-                                    List<Integer> indexes = (ArrayList<Integer>) result.get(max.get(i)).get(4);
-                                    List<String> code = graphs.get(indexes.getLast()).codesRectangle(rect);
-                                    minimizedFormulas.add(getTerm((int[]) result.get(max.get(i)).get(2), code, truthTable, rowsGreysCode, colomnsGreysCode));
-                                    var prevCovered = graphs.get(indexes.getLast()).setGetCovered(rect);
-                                    graphs.get(indexes.getFirst()).setCovered(prevCovered);
-                                    //neightbor
-                                }
-                        }
-                        break;
-                    case 3:
-                        for (int i = 1; i < max.size(); i++) {
-                            if (graphRectangles.get(max.get(i)) != null)
-                                for (var rect : graphRectangles.get(max.get(i))) {
-                                    minimizedFormulas.add(collectGreysCode(columnGreyCode.get(max.get(i)), rowGreyCode.get(max.get(i)),
-                                            rect, truthTable.getStatements()));
-                                    graphs.get(max.get(i)).setCovered(rect);
-                                }
-                        }
-
-
-                }
-            }
+            handleMoreThen4VariablesCase(truthTable, rowsGreysCode, colomnsGreysCode, minimizedFormulas, type);
         }
-        print(minimizedFormulas, type);
+        //print(minimizedFormulas, type);
+        return minimizedFormulas;
     }
 }
