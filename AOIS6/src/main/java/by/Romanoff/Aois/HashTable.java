@@ -1,4 +1,5 @@
 package by.Romanoff.Aois;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -6,14 +7,14 @@ import java.util.Objects;
 public class HashTable {
 
     private static class Entry {
-        Object id; // Ключевое слово
-        Object data; // Данные
+        Object id; 
+        Object data; // Pi
         boolean collisionFlag; // C
         boolean occupiedFlag;  // U
         boolean terminalFlag;  // T
         boolean linkFlag;      // L
         boolean deletedFlag;   // D
-        Entry next; // Po — следующая запись в цепочке
+        Entry next; // Po
 
         Entry(Object id, Object data) {
             this.id = id;
@@ -21,7 +22,7 @@ public class HashTable {
             this.collisionFlag = false;
             this.occupiedFlag = true;
             this.terminalFlag = true;
-            this.linkFlag = false;
+            this.linkFlag = true;
             this.deletedFlag = false;
             this.next = null;
         }
@@ -51,21 +52,42 @@ public class HashTable {
     }
 
     private int hash(Object key) {
+        if(key.getClass() == String.class) {
+            int hashCode=0;
+            for(int i=0;i<((String) key).length()&&i<3;i++){
+                hashCode+=(((String) key).charAt(i)*69);
+            }
+            return Math.abs(hashCode)%size;
+        }
+        if(key.getClass() == Integer.class) {
+            int hashCode=0;
+            for(int i=0;i<((Integer) key).intValue();i++) {
+                hashCode+=(((Integer) key)*69);
+            }
+            return Math.abs(hashCode)%size;
+        }
         return Math.abs(Objects.hashCode(key)) % size;
     }
 
-    // Создание (Create)
     public void insert(Object id, Object data) {
         int index = hash(id);
         List<Entry> bucket = table[index];
 
         for (Entry entry : bucket) {
-            if (entry.id.equals(id) && !entry.deletedFlag) {
-                System.out.println("Ошибка: ключ уже существует!");
-                return;
+            if (entry.id.equals(id) ) {
+                if(!entry.deletedFlag) {
+                    System.out.println("Ошибка: ключ уже существует!");
+                    return;
+                }else{
+                    entry.data = data;
+                    entry.id=id;
+                    entry.deletedFlag=false;
+                    entry.occupiedFlag=true;
+                    System.out.println("Успешно вставлено: " + id);
+                    return;
+                }
             }
         }
-
         Entry newEntry = new Entry(id, data);
 
         if (!bucket.isEmpty()) {
@@ -73,6 +95,7 @@ public class HashTable {
             newEntry.collisionFlag = true;
             if (bucket.getLast() != null) {
                 bucket.getLast().terminalFlag = false;
+                bucket.getLast().next=newEntry;
             }
         }
 
@@ -107,6 +130,7 @@ public class HashTable {
             if (entry.id.equals(id) && !entry.deletedFlag) {
                 entry.deletedFlag = true;
                 entry.occupiedFlag = false;
+
                 System.out.println("Удалено: " + id);
                 return true;
             }
@@ -120,7 +144,7 @@ public class HashTable {
         for (int i = 0; i < size; i++) {
             System.out.printf("[%d]: ", i);
             for (Entry entry : table[i]) {
-                System.out.print(" -> {" + entry + "} ");
+                System.out.print(" -> {" + entry.toString() + "} ");
             }
             System.out.println();
         }
