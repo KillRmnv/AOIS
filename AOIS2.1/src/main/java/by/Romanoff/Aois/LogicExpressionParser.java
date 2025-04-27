@@ -22,7 +22,7 @@ public class LogicExpressionParser {
         expressionPatterns.add(Pattern.compile("([α-ω]|\\d+)+~([α-ω]|\\d+)+"));
     }
 
-    private String replaceStatements(String expression, LinkedHashMap<String, Character> Statements) {
+    private String replaceStatements(String expression, Map<String, Character> Statements) {
         Pattern lines = Pattern.compile("\\w+");
         String copy = new String(expression);
         expressionMatcher = lines.matcher(expression);
@@ -76,7 +76,7 @@ public class LogicExpressionParser {
         return expression;
     }
 
-    public HashMap<Integer, String> parseOnBasicExpressions(String expression, LinkedHashMap<String, Character> Statements) {
+    public HashMap<Integer, String> parseOnBasicExpressions(String expression, Map<String, Character> Statements) {
         HashMap<Integer, String> result = new HashMap<>();
         expression = replaceStatements(expression, Statements);
         for (int i = 0; i < expressionPatterns.size(); i++) {

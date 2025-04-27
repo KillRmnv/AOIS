@@ -3,17 +3,14 @@ package by.Romanoff.Aois;
 import lombok.Data;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 @Data
 public class TruthTable {
     @Getter
-    private HashMap<Integer, String> BasicLogicExpressions = new HashMap<>();
+    private Map<Integer, String> BasicLogicExpressions = new HashMap<>();
     @Getter
-    private LinkedHashMap<String, Character> Statements = new LinkedHashMap<>();
+    private Map<String, Character> Statements = new LinkedHashMap<>();
     @Getter
     private List<List<Integer>> combinations;
 
@@ -28,8 +25,15 @@ public class TruthTable {
             }
         }
     }
+    public void createLine(int line){
+        LogicExpressionAnalyser logicExpressionAnalyser = new LogicExpressionAnalyser();
+        for (int j = 0; j < BasicLogicExpressions.size(); j++) {
+            combinations.get(line).add(logicExpressionAnalyser.isTrue((ArrayList<Integer>) combinations.get(line), BasicLogicExpressions.get(j), Statements.size()) ? 1 : 0);
+        }
+    }
 
-    private List<List<Integer>> allPossibleCombinations(int amntOfStatements) {
+
+    public List<List<Integer>> allPossibleCombinations(int amntOfStatements) {
         BinNumber binNumber = new BinNumber();
         List<Integer> number = new ArrayList<>();
         for (int i = 0; i < amntOfStatements + 1; i++) {
@@ -94,6 +98,11 @@ public class TruthTable {
                 maxLength = expression.length();
             }
         }
+        for (String expression : Statements.keySet()) {
+            if (expression.length() > maxLength) {
+                maxLength = expression.length();
+            }
+        }
 
         for (String statement : Statements.keySet()) {
 
@@ -108,7 +117,8 @@ public class TruthTable {
         // for 3 lab
         for (var combination : combinations) {
             for (int i = 0; i < Statements.size(); i++) {
-                System.out.print(combination.get(i) + " ");
+                int value = combination.get(i);
+                System.out.printf("%-" + (maxLength + 1) + "d", value);
             }
 
             for (int i = 0; i < BasicLogicExpressions.size(); i++) {

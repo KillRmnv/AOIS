@@ -745,7 +745,14 @@ public class KarnosMapMethod {
                 result.append("&");
             }
         }
-        result.append(term(type, minimized.getLast()));
+        if(minimized.isEmpty()){
+            result.append("1");
+        }else {
+            if (minimized.getFirst().isEmpty()) {
+                result.append("1");
+            } else if(!minimized.getLast().isEmpty())
+                result.append(term(type, minimized.getLast()));
+        }
         System.out.println(result);
     }
 
@@ -1140,6 +1147,28 @@ public class KarnosMapMethod {
                     }
             }
         }
+    }
+    public List<List<String>> KarnosMapMethod(TruthTable truthTable,int type){
+        int rows = truthTable.getStatements().size() / 2;
+        List<String> rowsGreysCode = createGreysCode(rows);
+        List<String> colomnsGreysCode = createGreysCode(truthTable.getStatements().size() - rows);
+        fillMap(truthTable.getCombinations(), rowsGreysCode, colomnsGreysCode, type);
+        List<List<String>> minimizedFormulas = new ArrayList<>();
+        printTable(rowsGreysCode, colomnsGreysCode);
+        if (truthTable.getStatements().size() < 3) {
+            List<int[]> rectangles = rectanglesInSimpleCase(type);
+            for (var rectangle : rectangles) {
+                minimizedFormulas.add(collectGreysCode(rowsGreysCode, colomnsGreysCode, rectangle, truthTable.getStatements(), type));
+            }
+        } else if (truthTable.getStatements().size() == 4||truthTable.getStatements().size() == 3) {
+            Set<Set<Integer>> rectangles = rectanglesIn4VariablesCase(0);
+            for (var rectangle : rectangles) {
+                minimizedFormulas.add(collectGreysCode(rowsGreysCode, colomnsGreysCode, rectangle, truthTable.getStatements(), type));
+            }
+        } else {
+            handleMoreThen4VariablesCase(truthTable, rowsGreysCode, colomnsGreysCode, minimizedFormulas, type);
+        }
+        return minimizedFormulas;
     }
 
     public List<List<String>> createKarnos(String expression, int type) {

@@ -15,7 +15,9 @@ class Subtractor {
         Map<String, Character> statements = new LinkedHashMap<>();
         statements.put("A", 'A');
         statements.put("B", 'B');
-        statements.put("C", 'C');
+        statements.put("Bin", 'C');
+        //statements.put("D", 'C');
+       // statements.put("Bout", 'C');
         truthTable.setStatements(statements);
         calculationMethod = new CalculationMethod();
         truthTable.setCombinations(truthTable.allPossibleCombinations(3));
@@ -26,8 +28,12 @@ class Subtractor {
             truthTable.getCombinations().get(i).add(substract(truthTable.getCombinations().get(i)));
         }
         var result = normalFormCreator.sdnf(truthTable.getCombinations(), truthTable.getStatements());
+
         var sdnf1 = calculationMethod.applyMethodSdnf((Map<java.lang.Integer, java.lang.String>) result.get("HashTableOfSDNF"),
                 truthTable.getStatements().size());
+        truthTable.getStatements().put("D", 'C');
+        truthTable.print();
+        truthTable.getStatements().remove(("D"));
         Output.printResult((Map<java.lang.Integer, java.lang.String>) result.get("HashTableOfSDNF"), 1);
         System.out.println("Минимизированная:");
         Output.printResult(sdnf1, 1);
@@ -37,9 +43,13 @@ class Subtractor {
             } else
                 truthTable.getCombinations().get(i).add(0);
         }
+
         result = normalFormCreator.sdnf(truthTable.getCombinations(), truthTable.getStatements());
         var sdnf2 = calculationMethod.applyMethodSdnf((Map<java.lang.Integer, java.lang.String>) result.get("HashTableOfSDNF"),
                 truthTable.getStatements().size());
+        truthTable.getStatements().put("D", 'C');
+        truthTable.getStatements().put("Bout", 'C');
+        truthTable.print();
         Output.printResult((Map<java.lang.Integer, java.lang.String>) result.get("HashTableOfSDNF"), 1);
         System.out.println("Минимизированная:");
         Output.printResult(sdnf2, 1);

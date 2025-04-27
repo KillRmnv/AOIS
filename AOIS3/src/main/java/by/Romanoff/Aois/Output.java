@@ -1,41 +1,10 @@
 package by.Romanoff.Aois;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Main {
-    public static void main(String[] args) {
-        String expression = "(A|!B|!C|!D)&E";
-        LogicExpressionParser parser = new LogicExpressionParser();
-        TruthTable truthTable = new TruthTable();
-        truthTable.createTruthTable(parser.parseOnBasicExpressions(expression, truthTable.getStatements()));
-        truthTable.print();
-        NormalFormCreator normalFormCreator = new NormalFormCreator();
-        HashMap<String, Object> result;
-        result = normalFormCreator.sdnf(truthTable.getCombinations(), truthTable.getStatements());
-        System.out.println("СДНФ" + result.get("result"));
-        System.out.println("Числовая форма" + result.get("NumericalForm"));
-        CalculationMethod calculationMethod = new CalculationMethod();
-        TableMethod tableMethod = new TableMethod();
-        KarnosMapMethod karnosMapMethod = new KarnosMapMethod();
-        var SDNF = tableMethod.applyMethod((HashMap<Integer, String>) result.get("HashTableOfSDNF"), truthTable.getStatements().size(), 1);
-        Output.printResult(SDNF,1);
-
-        SDNF = calculationMethod.applyMethodSdnf((HashMap<Integer, String>) result.get("HashTableOfSDNF"), truthTable.getStatements().size());
-        Output.printResult(SDNF,1);
-        karnosMapMethod.print(karnosMapMethod.createKarnos(expression, 1), 1);
-        result = normalFormCreator.sknf(truthTable.getCombinations(), truthTable.getStatements());
-        var SKNF = tableMethod.applyMethod((HashMap<Integer, String>) result.get("HashTableOfSKNF"), truthTable.getStatements().size(), 0);
-        Output.printResult(SKNF,0);
-        SKNF = calculationMethod.applyMethodSknf((HashMap<Integer, String>) result.get("HashTableOfSKNF"), truthTable.getStatements().size());
-        Output.printResult(SKNF,0);
-        karnosMapMethod = new KarnosMapMethod();
-        karnosMapMethod.print(karnosMapMethod.createKarnos(expression, 0), 0);
-
-    }
-
+public class Output {
     public static List<String> constituentsList(Map<Integer, String> SDNF, int type) {
         List<String> glued = new ArrayList<>();
         List<Integer> keys = new ArrayList<>(SDNF.keySet());
@@ -86,7 +55,7 @@ public class Main {
         return glued;
     }
 
-    static void printResult(Map<Integer, String> SDNF, int type) {
+   public static void printResult(Map<Integer, String> SDNF, int type) {
         var glued = constituentsList(SDNF, type);
         print(glued, type);
     }
@@ -102,13 +71,3 @@ public class Main {
         System.out.println();
     }
 }
-
-
-//(A->(B|!C))~(D&(E->Q))->!T
-//(!A|B)->(C&(D~E))|(Q->T)
-//(!(A&B)|(C->D))~(E&Q)->!T
-//!((A&B)|(C->D))~E
-//(A&B)|(!C->D)|E
-//!(A|B)~(C&D)->E
-//(A~(B->C))|(D&E)
-//((A&B)->(C|D))~!E

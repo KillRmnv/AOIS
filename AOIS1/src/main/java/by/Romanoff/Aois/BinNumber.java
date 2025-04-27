@@ -124,8 +124,10 @@ public class BinNumber {
     }
 
     public List<Integer> Adding(List<Integer> anthrBin) {
+
         num.add(1, 0);
         anthrBin.add(1, 0);
+
         if (num.size() > anthrBin.size()) {
             int diff = num.size() - anthrBin.size();
             for (int i = 0; i < diff; i++) {
@@ -137,12 +139,22 @@ public class BinNumber {
                 num.add(1, 0);
             }
         }
+        int numSize=num.size();
+        int binSize=anthrBin.size();
         if (anthrBin.get(0) == 1) {
             anthrBin.set(0, 0);
             num = Subtracting(anthrBin);
+            while(num.size() > numSize) {
+                num.removeFirst();
+                anthrBin.removeFirst();
+            }
             return convertToTwoComplmnt();
         }
         num = AddingOperation(anthrBin);
+            while(num.size() > numSize) {
+                num.removeFirst();
+                anthrBin.removeFirst();
+            }
         return convertToTwoComplmnt();
     }
 

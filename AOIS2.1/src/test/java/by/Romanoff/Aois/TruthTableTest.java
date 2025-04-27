@@ -85,10 +85,10 @@ class TruthTableTest {
 
         String expectedOutput =
                 "A B A&B A|B \n" +
-                        "0 0 0   0   \n" +
-                        "0 1 0   1   \n" +
-                        "1 0 0   1   \n" +
-                        "1 1 1   1   \n";
+                        "0   0   0   0   \n" +
+                        "0   1   0   1   \n" +
+                        "1   0   0   1   \n" +
+                        "1   1   1   1   \n";
 
         assertEquals(expectedOutput, outputStream.toString());
     }

@@ -219,7 +219,7 @@ public class TableMethod {
 
     private void printTable(List<String> constituents, Map<Integer, String> gluedExpression,int type) {
 
-        List<String> glued = new ArrayList<>(Main.constituentsList(gluedExpression,type));
+        List<String> glued = new ArrayList<>(Output.constituentsList(gluedExpression,type));
 
         int columnCount = constituents.size();
         int[] columnWidths = new int[columnCount + 1];

@@ -123,7 +123,7 @@ public class CalculationMethod {
             int Type = 1;
             if (type)
                 Type = 0;
-            List<String> constituentsList = Main.constituentsList(sknfOrSdnf, Type);
+            List<String> constituentsList = Output.constituentsList(sknfOrSdnf, Type);
             constituentsList.removeAll(uniqueStatements);
             if (constituentsList.isEmpty()) {
                 return false;

@@ -14,7 +14,7 @@ public class UI {
         truthTable.createTruthTable(parser.parseOnBasicExpressions(expression,truthTable.getStatements()));
         truthTable.print();
         NormalFormCreator normalFormCreator = new NormalFormCreator();
-        HashMap<String, Object> result ;
+        Map<String, Object> result ;
         result = normalFormCreator.sdnf(truthTable.getCombinations(), truthTable.getStatements());
         System.out.println("СДНФ" + result.get("result"));
         System.out.println("Числовая форма" + result.get("NumericalForm"));

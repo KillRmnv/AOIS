@@ -1,18 +1,16 @@
 package by.Romanoff.Aois;
 
-import java.util.LinkedHashMap;
+import java.util.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class NormalFormCreatorTest {
     private NormalFormCreator normalFormCreator;
     private TruthTable truthTable;
-    private LinkedHashMap<String, Character> statements;
+    private Map<String, Character> statements;
 
     @BeforeEach
     void setUp() {

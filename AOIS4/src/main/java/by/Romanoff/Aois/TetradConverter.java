@@ -1,10 +1,7 @@
 package by.Romanoff.Aois;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TetradConverter {
     private BinNumber addingN;
@@ -17,11 +14,15 @@ public class TetradConverter {
         addingN = new BinNumber();
         addingN.Setter(binConverter.ConvertToBin(9));
         truthTable = new TruthTable();
-        Map<String, Character> Statements=new HashMap<>();
+        Map<String, Character> Statements=new LinkedHashMap<>();
         Statements.put("A", 'n');
         Statements.put("B", 'k');
         Statements.put("C", 'm');
         Statements.put("D", 's');
+        Statements.put("Y0", 't');
+        Statements.put("Y1", 't');
+        Statements.put("Y2", 't');
+        Statements.put("Y3", 't');
         karnosMapMethod = new KarnosMapMethod();
         truthTable.setStatements(Statements);
         truthTable.setCombinations(truthTable.allPossibleCombinations(4));
@@ -35,35 +36,35 @@ public class TetradConverter {
         BinConverter binConverter = new BinConverter();
         int num=0;
         for (List<Integer> combination : combinations) {
-            if(biggerThen9){
-                if(num>9){
-                    num=0;
-                }
-               var dontCare= binConverter.ConvertToBin(num);
-
-               while(dontCare.size()<5){
-                   dontCare.add(1,0);
-               }
-                dontCare.removeFirst();
-               trim(dontCare);
-               result.add(dontCare);
-                num++;
-                continue;
-            }
+//            if(biggerThen9){
+//                if(num>9){
+//                    num=0;
+//                }
+//               var dontCare= binConverter.ConvertToBin(num);
+//
+//               while(dontCare.size()<5){
+//                   dontCare.add(1,0);
+//               }
+//                dontCare.removeFirst();
+//               trim(dontCare);
+//               result.add(dontCare);
+//                num++;
+//                continue;
+//            }
             combination.addFirst(0);
             List<Integer> addition = addingN.Adding(combination);
             addingN.Setter(adding);
             trim(addition);
             trim(combination);
-            if(addition.getFirst()==1&&addition.get(2)==1){
-                biggerThen9=true;
-                var dontCare= binConverter.ConvertToBin(num);
-                dontCare.removeFirst();
-                trim(dontCare);
-                result.add(dontCare);
-                num++;
-                continue;
-            }
+//            if(addition.getFirst()==1&&addition.get(2)==1){
+//                biggerThen9=true;
+//                var dontCare= binConverter.ConvertToBin(num);
+//                dontCare.removeFirst();
+//                trim(dontCare);
+//                result.add(dontCare);
+//                num++;
+//                continue;
+//            }
             result.add(addition);
         }
         return result;
@@ -96,6 +97,10 @@ public class TetradConverter {
             index++;
             System.out.println();
         }
+        truthTable.getStatements().remove("Y0", 't');
+        truthTable.getStatements().remove("Y1", 't');
+        truthTable.getStatements().remove("Y2", 't');
+        truthTable.getStatements().remove("Y3", 't');
     }
     public void minimizeTetrads(List<List<Integer>> tetrads){
         for(int index=0;index<tetrads.getFirst().size();++index) {

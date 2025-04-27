@@ -3,7 +3,7 @@ package by.Romanoff.Aois;
 import java.util.*;
 
 public class NormalFormCreator {
-    public HashMap<String, Object> sdnf(List<List<Integer>> truthTable, LinkedHashMap<String, Character> statements) {
+    public HashMap<String, Object> sdnf(List<List<Integer>> truthTable, Map<String, Character> statements) {
         String result = new String();
         ArrayList<Integer> NumericalForm = new ArrayList<>();
         Iterator<String> keyIterator;
@@ -41,7 +41,7 @@ public class NormalFormCreator {
         return resultMap;
     }
 
-    public HashMap<String, Object> sknf(List<List<Integer>> truthTable, LinkedHashMap<String, Character> statements) {
+    public HashMap<String, Object> sknf(List<List<Integer>> truthTable, Map<String, Character> statements) {
         String result = new String();
         HashMap<Integer, String> hashTableOfSKNF = new HashMap<>();
         int numberOfStatement = 11;
