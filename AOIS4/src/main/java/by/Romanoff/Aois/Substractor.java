@@ -17,7 +17,7 @@ class Subtractor {
         statements.put("B", 'B');
         statements.put("Bin", 'C');
         //statements.put("D", 'C');
-       // statements.put("Bout", 'C');
+        // statements.put("Bout", 'C');
         truthTable.setStatements(statements);
         calculationMethod = new CalculationMethod();
         truthTable.setCombinations(truthTable.allPossibleCombinations(3));

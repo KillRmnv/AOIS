@@ -7,7 +7,7 @@ import java.util.Objects;
 public class HashTable {
 
     private static class Entry {
-        Object id; 
+        Object id;
         Object data; // Pi
         boolean collisionFlag; // C
         boolean occupiedFlag;  // U
